@@ -1,0 +1,131 @@
+{% extends 'staff/base_staff.html' %}
+{% block title %}Route Planner #{{ collection.pk }} — Recycle-IT!{% endblock %}
+{% block nav_route %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <p class="breadcrumb-text">
+            <a href="{% url 'route_planner_index' %}">Route Planner</a>
+            &rsaquo; Collection #COL-{{ collection.pk }}
+        </p>
+        <h2>Route Planner — Collection #COL-{{ collection.pk }}</h2>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="confirm_schedule">
+        <button type="submit" class="btn btn-primary">
+            &#10003; Confirm Schedule
+        </button>
+    </form>
+</div>
+
+<div class="route-grid">
+
+    <div class="route-sidebar">
+        <div class="panel">
+            <h3>Assigned Donations</h3>
+
+            {% if route_result.ordered_stops %}
+            <p class="detail-label">STOP ORDER</p>
+            <ol class="stop-list">
+                {% for stop in route_result.ordered_stops %}
+                <li class="stop-item">
+                    <strong>{{ stop.donor }}</strong>
+                    <span>{{ stop.address }}</span>
+                </li>
+                {% endfor %}
+            </ol>
+            {% else %}
+            <p class="empty-state">No donations assigned to this collection.</p>
+            {% endif %}
+
+            {% if route_result %}
+            <div class="route-meta">
+                {% if route_result.optimised %}
+                <span class="badge badge-approved">&#10003; Optimised</span>
+                {% else %}
+                <span class="badge badge-warning">Manual order</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="panel">
+            <h3>Optimise Route</h3>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="optimise">
+                <button type="submit" class="btn btn-primary btn-block">
+                    Optimise via OpenRouteService
+                </button>
+            </form>
+
+            {% if route_result and route_result.total_distance_km %}
+            <div style="margin-top:1rem;">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="save_distance">
+                    <input type="hidden" name="total_distance_km"
+                           value="{{ route_result.total_distance_km }}">
+                    <button type="submit" class="btn btn-outline btn-block">
+                        Save Distance ({{ route_result.total_distance_km }} km)
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="panel">
+            <h3>Collection Details</h3>
+            <p><strong>Driver:</strong>
+                {{ collection.driver_name|default:"Not set" }}
+            </p>
+            <p><strong>Vehicle:</strong>
+                {{ collection.vehicle_id|default:"Not set" }}
+            </p>
+            <p><strong>Distance:</strong>
+                {% if collection.total_distance_km %}
+                {{ collection.total_distance_km }} km
+                {% else %}Not calculated{% endif %}
+            </p>
+            {% if estimated_emissions %}
+            <p><strong>Est. CO&#8322;:</strong>
+                {{ estimated_emissions }} kg
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="route-main">
+        <div class="panel">
+            <h3>Route Summary</h3>
+            {% if route_result and route_result.total_distance_km %}
+            <div class="route-stats">
+                <div class="route-stat">
+                    <p class="stat-label">Total Distance</p>
+                    <p class="stat-value">{{ route_result.total_distance_km }} km</p>
+                </div>
+                {% if estimated_emissions %}
+                <div class="route-stat">
+                    <p class="stat-label">Est. CO&#8322;</p>
+                    <p class="stat-value">{{ estimated_emissions }} kg</p>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <p class="empty-state">
+                Optimise the route to see distance and emissions estimates.
+            </p>
+            {% endif %}
+
+            <div class="manual-override">
+                <p>&#9888; <strong>Manual Override Available</strong> — if the
+                API is unavailable, stop order above reflects original assignment
+                order.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'staff/base_staff.html' %}
+{% block title %}KPI Dashboard — Recycle-IT!{% endblock %}
+{% block nav_kpi %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>KPI Dashboard</h2>
+        <p>Environmental &amp; Operational Performance</p>
+    </div>
+</div>
+
+<div class="stat-cards">
+    <div class="stat-card">
+        <p class="stat-label">Total CO&#8322; Saved (kg)</p>
+        <p class="stat-value">{{ total_co2 }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Devices Diverted</p>
+        <p class="stat-value">{{ devices_diverted }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Completed Collections</p>
+        <p class="stat-value">{{ completed_collections }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Total Distance Driven (km)</p>
+        <p class="stat-value">{{ total_distance }}</p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Fuel Usage per Collection</h3>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Collection</th>
+                    <th>Distance</th>
+                    <th>Fuel (L)</th>
+                    <th>CO&#8322; (kg)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in fuel_table %}
+                <tr>
+                    <td>#COL-{{ record.collection.pk }}</td>
+                    <td>{{ record.distance_km }} km</td>
+                    <td>{{ record.fuel_litres_used }} L</td>
+                    <td>{{ record.co2_kg }} kg</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        No completed collections yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if fuel_table %}
+            <tfoot>
+                <tr>
+                    <td><strong>Totals</strong></td>
+                    <td>{{ total_distance }} km</td>
+                    <td>{{ total_fuel }} L</td>
+                    <td>{{ total_co2 }} kg</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+
+    {% if request.user.is_admin %}
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Emissions Formula Configuration</h3>
+            <span class="badge badge-warning">Admin only</span>
+        </div>
+        <p>The CO&#8322; calculation uses the following configurable values:</p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label>{{ settings_form.co2_per_litre_kg.label }}</label>
+                {{ settings_form.co2_per_litre_kg }}
+            </div>
+            <div class="form-group">
+                <label>{{ settings_form.fuel_efficiency_km_per_litre.label }}</label>
+                {{ settings_form.fuel_efficiency_km_per_litre }}
+            </div>
+            <div class="formula-note">
+                <p>Formula: CO&#8322; (kg) = (distance_km ÷ fuel_efficiency)
+                &times; co2_per_litre</p>
+                <p>These values are user-configurable and stored as system
+                settings — not hardcoded.</p>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                Save Settings
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

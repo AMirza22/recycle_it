@@ -1,0 +1,57 @@
+{% extends 'staff/base_staff.html' %}
+{% block title %}Route Planner — Recycle-IT!{% endblock %}
+{% block nav_route %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Route Planner</h2>
+</div>
+
+<p>Select a collection to plan or optimise its route.</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Collection</th>
+            <th>Status</th>
+            <th>Donations</th>
+            <th>Scheduled</th>
+            <th>Distance</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for collection in collections %}
+        <tr>
+            <td>#COL-{{ collection.pk }}</td>
+            <td>
+                <span class="badge badge-{{ collection.status }}">
+                    {{ collection.get_status_display }}
+                </span>
+            </td>
+            <td>{{ collection.donations.count }}</td>
+            <td>
+                {% if collection.scheduled_datetime %}
+                {{ collection.scheduled_datetime|date:"d M Y" }}
+                {% else %}—{% endif %}
+            </td>
+            <td>
+                {% if collection.total_distance_km %}
+                {{ collection.total_distance_km }} km
+                {% else %}—{% endif %}
+            </td>
+            <td>
+                <a href="{% url 'route_planner' collection.pk %}"
+                   class="btn btn-sm">Plan Route</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="empty-state">
+                No collections available for route planning.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

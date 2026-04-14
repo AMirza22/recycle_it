@@ -1,0 +1,106 @@
+{% extends 'staff/base_staff.html' %}
+{% block title %}Dashboard — Recycle-IT!{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Dashboard Overview</h2>
+    </div>
+    <a href="{% url 'collection_create' %}" class="btn btn-primary">
+        + New Collection
+    </a>
+</div>
+
+<div class="stat-cards">
+    <div class="stat-card">
+        <p class="stat-label">Pending Donations</p>
+        <p class="stat-value">{{ pending_donations }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Scheduled Collections</p>
+        <p class="stat-value">{{ scheduled_collections }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">CO&#8322; Saved (kg)</p>
+        <p class="stat-value">{{ total_co2_saved }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Devices Diverted</p>
+        <p class="stat-value">{{ devices_diverted }}</p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+
+    <div class="dashboard-panel">
+        <div class="panel-header">
+            <h3>Recent Donations</h3>
+            <a href="{% url 'donations_list' %}" class="btn btn-sm">View All</a>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ref ID</th>
+                    <th>Donor</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in recent_donations %}
+                <tr>
+                    <td>{{ donation.reference_id }}</td>
+                    <td>{{ donation.donor.company_name }}</td>
+                    <td>
+                        <span class="badge badge-{{ donation.approval_status }}">
+                            {{ donation.get_approval_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ donation.created_at|date:"d M Y" }}</td>
+                    <td>
+                        <a href="{% url 'donation_review' donation.pk %}">
+                            Review
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No donations yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="dashboard-panel">
+        <div class="panel-header">
+            <h3>Upcoming Collections</h3>
+        </div>
+        {% for collection in upcoming_collections %}
+        <div class="collection-card">
+            <div class="collection-card-header">
+                <strong>Collection #COL-{{ collection.pk }}</strong>
+                <span class="badge badge-{{ collection.status }}">
+                    {{ collection.get_status_display }}
+                </span>
+            </div>
+            <p>{{ collection.donations.count }} donation(s)</p>
+            {% if collection.scheduled_datetime %}
+            <p>{{ collection.scheduled_datetime|date:"D d M · H:i" }}</p>
+            {% endif %}
+            <a href="{% url 'collection_detail' collection.pk %}" class="btn btn-sm">
+                View
+            </a>
+        </div>
+        {% empty %}
+        <p class="empty-state">No upcoming collections.</p>
+        {% endfor %}
+        <a href="{% url 'collection_create' %}" class="btn btn-outline btn-block">
+            + Schedule New
+        </a>
+    </div>
+
+</div>
+{% endblock %}

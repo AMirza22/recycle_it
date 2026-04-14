@@ -1,0 +1,134 @@
+{% extends 'staff/base_staff.html' %}
+{% block title %}Collection #{{ collection.pk }} — Recycle-IT!{% endblock %}
+{% block nav_collections %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <p class="breadcrumb-text">
+            <a href="{% url 'collections_list' %}">Collections</a> &rsaquo;
+            Detail
+        </p>
+        <h2>Collection #COL-{{ collection.pk }}</h2>
+    </div>
+    <div class="header-actions">
+        <a href="{% url 'route_planner' collection.pk %}" class="btn btn-outline">
+            Route Planner
+        </a>
+        {% if collection.status != 'completed' %}
+        <form method="post"
+              action="{% url 'collection_update_status' collection.pk %}">
+            {% csrf_token %}
+            <select name="status" onchange="this.form.submit()"
+                    class="input-field">
+                {% for val, label in collection.STATUS_CHOICES %}
+                <option value="{{ val }}"
+                    {% if collection.status == val %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="detail-summary">
+    <p><strong>Status:</strong>
+        <span class="badge badge-{{ collection.status }}">
+            {{ collection.get_status_display }}
+        </span>
+    </p>
+    <p><strong>Scheduled:</strong>
+        {% if collection.scheduled_datetime %}
+        {{ collection.scheduled_datetime|date:"D d M Y · H:i" }}
+        {% else %}Not set{% endif %}
+    </p>
+    <p><strong>Driver:</strong>
+        {{ collection.driver_name|default:"Not assigned" }}
+    </p>
+    <p><strong>Vehicle:</strong>
+        {{ collection.vehicle_id|default:"Not assigned" }}
+    </p>
+    <p><strong>Distance:</strong>
+        {% if collection.total_distance_km %}
+        {{ collection.total_distance_km }} km
+        {% else %}Not calculated{% endif %}
+    </p>
+    {% if emission_record %}
+    <p><strong>CO&#8322; Emissions:</strong>
+        {{ emission_record.co2_kg }} kg
+    </p>
+    {% endif %}
+</div>
+
+<div class="detail-grid">
+
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Assigned Donations ({{ stats.donation_count }})</h3>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ref ID</th>
+                    <th>Donor</th>
+                    <th>Address</th>
+                    <th>Items</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in collection.donations.all %}
+                <tr>
+                    <td>{{ donation.reference_id }}</td>
+                    <td>{{ donation.donor.company_name }}</td>
+                    <td>{{ donation.collection_address }}</td>
+                    <td>{{ donation.items.count }}</td>
+                    <td>
+                        {% if collection.status != 'completed' %}
+                        <form method="post"
+                              action="{% url 'collection_remove_donation' donation.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Remove
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        No donations assigned yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if collection.status != 'completed' %}
+        <div style="margin-top:1rem;">
+            <h4>Add a Donation</h4>
+            <form method="post"
+                  action="{% url 'collection_add_donation' collection.pk %}">
+                {% csrf_token %}
+                <div class="form-row">
+                    <select name="donation_id" class="input-field">
+                        <option value="">Select donation...</option>
+                        {% for donation in unassigned_donations %}
+                        <option value="{{ donation.pk }}">
+                            {{ donation.reference_id }} &middot;
+                            {{ donation.donor.company_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

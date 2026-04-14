@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Request Received — Recycle-IT!{% endblock %}
+
+{% block body %}
+<div class="success-page">
+    <div class="success-card">
+        <div class="success-icon">&#10003;</div>
+        <h1>Thank you!</h1>
+        <p>Your collection request has been received.</p>
+        <div class="reference-box">
+            <p>Your reference ID</p>
+            <strong>{{ reference_id }}</strong>
+        </div>
+        <p class="success-note">
+            A confirmation email has been sent to you. A member of our team
+            will review your request shortly.
+        </p>
+        <a href="{% url 'donate' %}" class="btn btn-primary">
+            Submit another request
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,117 @@
+/* ── Staff Portal Layout ──────────────────────────────────────────────────── */
+
+body.staff-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--grey-100);
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+
+.sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--navy);
+    color: #c9d1e0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 1.5rem 1.25rem 1.25rem;
+    border-bottom: 1px solid var(--navy-border);
+}
+
+.sidebar-brand {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.3px;
+}
+
+.sidebar-sub {
+    display: block;
+    font-size: 0.7rem;
+    color: #6b7a99;
+    margin-top: 2px;
+    font-family: var(--font-mono);
+}
+
+/* ── Sidebar Nav ──────────────────────────────────────────────────────────── */
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0.75rem 0;
+    flex: 1;
+}
+
+.sidebar-nav li a {
+    display: block;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+    color: #8d9ab5;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.sidebar-nav li a:hover {
+    color: var(--white);
+    background: var(--navy-light);
+    text-decoration: none;
+}
+
+.sidebar-nav li.active a {
+    color: var(--white);
+    background: var(--navy-light);
+    border-left-color: var(--green-mid);
+    font-weight: 600;
+}
+
+/* ── Sidebar Footer ───────────────────────────────────────────────────────── */
+
+.sidebar-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--navy-border);
+    font-size: 0.8rem;
+}
+
+.sidebar-user {
+    display: block;
+    color: var(--white);
+    font-weight: 600;
+    margin-bottom: 1px;
+}
+
+.sidebar-role {
+    display: block;
+    color: #6b7a99;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.logout-link {
+    font-size: 0.75rem;
+    color: #6b7a99;
+    text-decoration: none;
+}
+
+.logout-link:hover {
+    color: var(--white);
+    text-decoration: none;
+}
+
+/* ── Main Content Area ────────────────────────────────────────────────────── */
+
+.main-content {
+    margin-left: 220px;
+    flex: 1;
+    padding: 1.5rem;
+    min-width: 0;
+}

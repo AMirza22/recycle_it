@@ -1,0 +1,181 @@
+{% extends 'staff/base_staff.html' %}
+{% block title %}Donation {{ donation.reference_id }} — Recycle-IT!{% endblock %}
+{% block nav_donations %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="breadcrumb">
+        <a href="{% url 'donations_list' %}">Donations</a> &rsaquo; Review Donation
+        <h2>Donation #{{ donation.reference_id }}</h2>
+    </div>
+    <a href="{% url 'donations_list' %}" class="btn btn-outline">
+        &larr; Back to list
+    </a>
+</div>
+
+{% if donation.approval_status == 'awaiting_review' %}
+<div class="alert alert-warning">
+    &#9888; Awaiting Staff Review — Submitted {{ donation.created_at|date:"d M Y \a\t H:i" }}
+</div>
+{% endif %}
+
+<div class="review-grid">
+
+    <div class="review-main">
+        <div class="panel">
+            <h3>Donor Details</h3>
+            <div class="detail-grid">
+                <div>
+                    <p class="detail-label">COMPANY</p>
+                    <p>{{ donation.donor.company_name }}</p>
+                </div>
+                <div>
+                    <p class="detail-label">CONTACT PERSON</p>
+                    <p>{{ donation.donor.contact_person }}</p>
+                </div>
+                <div>
+                    <p class="detail-label">EMAIL</p>
+                    <p>{{ donation.donor.contact_email }}</p>
+                </div>
+                <div>
+                    <p class="detail-label">PHONE</p>
+                    <p>{{ donation.donor.contact_phone|default:"—" }}</p>
+                </div>
+                <div class="span-2">
+                    <p class="detail-label">COLLECTION ADDRESS</p>
+                    <p>{{ donation.collection_address }}</p>
+                </div>
+                {% if donation.preferred_collection_datetime %}
+                <div class="span-2">
+                    <p class="detail-label">PREFERRED DATE / TIME</p>
+                    <p>{{ donation.preferred_collection_datetime|date:"d M Y · H:i" }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Items for Collection</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Item Category</th>
+                        <th>QTY</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in donation.items.all %}
+                    <tr>
+                        <td>{{ item.get_category_display }}</td>
+                        <td>{{ item.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="total-row">
+                        <td><strong>TOTAL</strong></td>
+                        <td>
+                            <strong>
+                                {{ donation.items.all|length }}
+                            </strong>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="detail-label" style="margin-top:1rem;">
+                DATA DESTRUCTION CERTIFICATE
+            </p>
+            <p>
+                {% if donation.data_destruction_required %}
+                <span class="badge badge-warning">Required</span>
+                {% else %}
+                Not required
+                {% endif %}
+            </p>
+
+            {% if donation.notes %}
+            <p class="detail-label" style="margin-top:1rem;">ADDITIONAL NOTES</p>
+            <p>{{ donation.notes }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="review-sidebar">
+
+        <div class="panel">
+            <h3>Review Decision</h3>
+            <p class="detail-label">Current Approval Status</p>
+            <span class="badge badge-{{ donation.approval_status }}">
+                {{ donation.get_approval_status_display }}
+            </span>
+
+            {% if donation.approval_status == 'awaiting_review' %}
+            <p style="margin-top:1rem;">Change status to:</p>
+            <div class="decision-buttons">
+                <form method="post" action="{% url 'donation_approve' donation.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-block">
+                        &#10003; Approve
+                    </button>
+                </form>
+                <form method="post" action="{% url 'donation_reject' donation.pk %}">
+                    {% csrf_token %}
+                    <input type="text" name="rejection_reason"
+                           placeholder="Reason for rejection (required)..."
+                           class="input-field" style="margin-bottom:0.5rem;">
+                    <button type="submit" class="btn btn-danger btn-block">
+                        &#10007; Reject
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            {% if donation.rejection_reason %}
+            <p class="detail-label" style="margin-top:1rem;">REJECTION REASON</p>
+            <p>{{ donation.rejection_reason }}</p>
+            {% endif %}
+        </div>
+
+        <div class="panel">
+            <h3>Assign to Collection</h3>
+            {% if donation.collection %}
+            <p>Assigned to:
+                <a href="{% url 'collection_detail' donation.collection.pk %}">
+                    Collection #{{ donation.collection.pk }}
+                </a>
+            </p>
+            <form method="post" action="{% url 'donation_unassign' donation.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline btn-sm">
+                    Remove from collection
+                </button>
+            </form>
+            {% elif donation.approval_status == 'approved' %}
+            <form method="post" action="{% url 'donation_assign' donation.pk %}">
+                {% csrf_token %}
+                <select name="collection_id" class="input-field">
+                    <option value="">Select existing collection...</option>
+                    {% for col in unassigned_collections %}
+                    <option value="{{ col.pk }}">
+                        Collection #{{ col.pk }} &middot;
+                        {{ col.get_status_display }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary btn-block"
+                        style="margin-top:0.5rem;">
+                    Assign
+                </button>
+            </form>
+            <div style="margin-top:0.75rem;">
+                <a href="{% url 'collection_create' %}" class="btn btn-outline btn-block">
+                    + Create New Collection
+                </a>
+            </div>
+            {% else %}
+            <p class="empty-state">Approve donation first to assign.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

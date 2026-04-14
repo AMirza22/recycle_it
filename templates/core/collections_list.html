@@ -1,0 +1,72 @@
+{% extends 'staff/base_staff.html' %}
+{% block title %}Collections — Recycle-IT!{% endblock %}
+{% block nav_collections %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Collections</h2>
+    <a href="{% url 'collection_create' %}" class="btn btn-primary">
+        + New Collection
+    </a>
+</div>
+
+<div class="filter-bar">
+    <form method="get">
+        <select name="status" onchange="this.form.submit()">
+            <option value="">All statuses</option>
+            {% for val, label in status_choices %}
+            <option value="{{ val }}"
+                {% if filters.status == val %}selected{% endif %}>
+                {{ label }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Collection</th>
+            <th>Status</th>
+            <th>Scheduled</th>
+            <th>Driver</th>
+            <th>Donations</th>
+            <th>Distance</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for collection in collections %}
+        <tr>
+            <td>#COL-{{ collection.pk }}</td>
+            <td>
+                <span class="badge badge-{{ collection.status }}">
+                    {{ collection.get_status_display }}
+                </span>
+            </td>
+            <td>
+                {% if collection.scheduled_datetime %}
+                {{ collection.scheduled_datetime|date:"d M Y · H:i" }}
+                {% else %}—{% endif %}
+            </td>
+            <td>{{ collection.driver_name|default:"—" }}</td>
+            <td>{{ collection.donations.count }}</td>
+            <td>
+                {% if collection.total_distance_km %}
+                {{ collection.total_distance_km }} km
+                {% else %}—{% endif %}
+            </td>
+            <td>
+                <a href="{% url 'collection_detail' collection.pk %}"
+                   class="btn btn-sm">View</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="empty-state">No collections found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

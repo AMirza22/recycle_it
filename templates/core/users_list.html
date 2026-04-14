@@ -1,0 +1,58 @@
+{% extends 'staff/base_staff.html' %}
+{% block title %}Users — Recycle-IT!{% endblock %}
+{% block nav_users %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>User Management</h2>
+    <a href="{% url 'user_create' %}" class="btn btn-primary">
+        + New User
+    </a>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td>{{ u.first_name }} {{ u.last_name }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+                {% if u.is_admin %}
+                <span class="badge badge-approved">Admin</span>
+                {% else %}
+                <span class="badge">Staff</span>
+                {% endif %}
+            </td>
+            <td>{% if u.is_active %}Yes{% else %}No{% endif %}</td>
+            <td>
+                <a href="{% url 'user_edit' u.pk %}"
+                   class="btn btn-sm">Edit</a>
+                {% if u.pk != request.user.pk %}
+                <form method="post" action="{% url 'user_delete' u.pk %}"
+                      style="display:inline;"
+                      onsubmit="return confirm('Delete this user?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        Delete
+                    </button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="empty-state">No users found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

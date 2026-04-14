@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block title %}Collection Order Form — Recycle-IT!{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/donate.css">
+{% endblock %}
+
+{% block body %}
+<div class="donate-page">
+
+    <header class="donate-header">
+        <div class="donate-header-inner">
+            <div>
+                <h1>Recycle-IT!</h1>
+                <p>Collection Order Form</p>
+            </div>
+            <a href="mailto:info@recycle-it.org.uk">info@recycle-it.org.uk</a>
+        </div>
+    </header>
+
+    <main class="donate-main">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="form-error-banner">
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <section class="form-section">
+                <h2>CLIENT DETAILS</h2>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label>{{ form.company_name.label }} *</label>
+                        {{ form.company_name }}
+                        {% if form.company_name.errors %}
+                        <p class="field-error">{{ form.company_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.contact_person.label }} *</label>
+                        {{ form.contact_person }}
+                        {% if form.contact_person.errors %}
+                        <p class="field-error">{{ form.contact_person.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.contact_email.label }} *</label>
+                        {{ form.contact_email }}
+                        {% if form.contact_email.errors %}
+                        <p class="field-error">{{ form.contact_email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.contact_phone.label }}</label>
+                        {{ form.contact_phone }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{ form.collection_address.label }} *</label>
+                    {{ form.collection_address }}
+                    {% if form.collection_address.errors %}
+                    <p class="field-error">{{ form.collection_address.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group form-group-half">
+                    <label>{{ form.preferred_collection_datetime.label }} *</label>
+                    {{ form.preferred_collection_datetime }}
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2>ITEMS FOR COLLECTION</h2>
+
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item Category</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ form.qty_processor.label }}</td>
+                            <td>{{ form.qty_processor }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.qty_monitor.label }}</td>
+                            <td>{{ form.qty_monitor }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.qty_printer.label }}</td>
+                            <td>{{ form.qty_printer }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.qty_accessories.label }}</td>
+                            <td>{{ form.qty_accessories }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.qty_networking.label }}</td>
+                            <td>{{ form.qty_networking }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.qty_mobile.label }}</td>
+                            <td>{{ form.qty_mobile }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.qty_other.label }}</td>
+                            <td>{{ form.qty_other }}</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>TOTAL ITEMS</strong></td>
+                            <td id="total-items">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="form-group">
+                    <label>{{ form.data_destruction_required.label }}</label>
+                    {{ form.data_destruction_required }}
+                </div>
+
+                <div class="form-group">
+                    <label>{{ form.notes.label }}</label>
+                    {{ form.notes }}
+                </div>
+
+                <div class="form-notice">
+                    <p>&#9432; System will auto-generate a Reference ID and send
+                    a confirmation email upon submission</p>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        Submit Collection Order
+                    </button>
+                    <span class="form-cancel">or <a href="#">Cancel</a></span>
+                </div>
+            </section>
+
+        </form>
+    </main>
+
+    <footer class="donate-footer">
+        <p>Recycle-IT! CIC &middot; 01204 356996 &middot;
+        info@recycle-it.org.uk &middot; Unit 10A Market Place, Bolton, BL1 2AL</p>
+    </footer>
+
+</div>
+
+<script>
+    // Live total item count
+    const qtyFields = document.querySelectorAll(
+        'input[name^="qty_"]'
+    );
+    const totalEl = document.getElementById('total-items');
+
+    function updateTotal() {
+        let total = 0;
+        qtyFields.forEach(f => total += parseInt(f.value) || 0);
+        totalEl.textContent = total;
+    }
+
+    qtyFields.forEach(f => f.addEventListener('input', updateTotal));
+    updateTotal();
+</script>
+
+{% endblock %}

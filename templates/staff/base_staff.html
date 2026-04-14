@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Recycle-IT! Staff Portal{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/staff.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="staff-layout">
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-brand">Recycle-IT!</h1>
+            <span class="sidebar-sub">Staff Portal</span>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="{% block nav_dashboard %}{% endblock %}">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="{% block nav_donations %}{% endblock %}">
+                <a href="{% url 'donations_list' %}">Donations</a>
+            </li>
+            <li class="{% block nav_collections %}{% endblock %}">
+                <a href="{% url 'collections_list' %}">Collections</a>
+            </li>
+            <li class="{% block nav_route %}{% endblock %}">
+                <a href="{% url 'route_planner_index' %}">Route Planner</a>
+            </li>
+            <li class="{% block nav_kpi %}{% endblock %}">
+                <a href="{% url 'kpi_dashboard' %}">KPI Dashboard</a>
+            </li>
+            {% if request.user.is_admin %}
+            <li class="{% block nav_users %}{% endblock %}">
+                <a href="{% url 'users_list' %}">Users</a>
+            </li>
+            {% endif %}
+        </ul>
+
+        <div class="sidebar-footer">
+            <span class="sidebar-user">
+                {{ request.user.first_name }} {{ request.user.last_name }}
+            </span>
+            <span class="sidebar-role">
+                {% if request.user.is_admin %}Admin{% else %}Staff{% endif %}
+            </span>
+            <a href="{% url 'logout' %}" class="logout-link">Sign out</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message message-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+
+    </div>
+
+</body>
+</html>
