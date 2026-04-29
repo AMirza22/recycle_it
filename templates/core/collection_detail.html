@@ -83,7 +83,7 @@
                 <tr>
                     <td>{{ donation.reference_id }}</td>
                     <td>{{ donation.donor.company_name }}</td>
-                    <td>{{ donation.collection_address }}</td>
+                    <td>{{ donation.full_address }}</td>
                     <td>{{ donation.items.count }}</td>
                     <td>
                         {% if collection.status != 'completed' %}

@@ -92,15 +92,20 @@ class RouteService:
         stop_map = {}
 
         for index, donation in enumerate(donations):
-            coords = RouteService.geocode_address(donation.collection_address)
-            if not coords:
-                return RouteService._fallback(donations)
+            # Use stored coordinates — set at donation submission time
+            if donation.latitude is None or donation.longitude is None:
+                # Fall back to live geocoding for legacy records without coords
+                coords = RouteService.geocode_address(donation.full_address)
+                if not coords:
+                    return RouteService._fallback(donations)
+            else:
+                coords = [donation.longitude, donation.latitude]  # ORS expects [lon, lat]
 
             job_id = index + 1
             jobs.append({'id': job_id, 'location': coords})
             stop_map[job_id] = {
                 'donation_id': donation.pk,
-                'address': donation.collection_address,
+                'address': donation.full_address,
                 'donor': donation.donor.company_name,
                 'coords': coords,
             }
@@ -168,7 +173,7 @@ class RouteService:
         ordered_stops = [
             {
                 'donation_id': d.pk,
-                'address': d.collection_address,
+                'address': d.full_address,
                 'donor': d.donor.company_name,
             }
             for d in donations

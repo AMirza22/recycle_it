@@ -41,9 +41,17 @@
                     <p class="detail-label">PHONE</p>
                     <p>{{ donation.donor.contact_phone|default:"—" }}</p>
                 </div>
-                <div class="span-2">
-                    <p class="detail-label">COLLECTION ADDRESS</p>
-                    <p>{{ donation.collection_address }}</p>
+                <div>
+                    <p class="detail-label">STREET ADDRESS</p>
+                    <p>{{ donation.street_address }}</p>
+                </div>
+                <div>
+                    <p class="detail-label">CITY / TOWN</p>
+                    <p>{{ donation.city }}</p>
+                </div>
+                <div>
+                    <p class="detail-label">POSTCODE</p>
+                    <p>{{ donation.postcode }}</p>
                 </div>
                 {% if donation.preferred_collection_datetime %}
                 <div class="span-2">

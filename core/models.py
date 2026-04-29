@@ -79,7 +79,11 @@ class Donation(models.Model):
         blank=True,
         related_name='donations'
     )
-    collection_address = models.CharField(max_length=500)
+    street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    postcode = models.CharField(max_length=10)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     preferred_collection_datetime = models.DateTimeField(null=True, blank=True)
     data_destruction_required = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
@@ -89,6 +93,10 @@ class Donation(models.Model):
     reference_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def full_address(self):
+        return f"{self.street_address}, {self.city}, {self.postcode}"
+    
     class Meta:
         db_table = 'donations'
 

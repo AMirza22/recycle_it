@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.http import HttpResponseForbidden
+from django.core.mail import send_mail
 from functools import wraps
 
 from .forms import (
@@ -129,8 +130,10 @@ def donate_view(request):
             DonationService.send_confirmation_email(donation, reference_id)
             request.session['reference_id'] = reference_id
             return redirect('donate_success')
+            
     else:
         form = DonorSubmissionForm()
+        
 
     return render(request, 'core/donate.html', {'form': form})
 

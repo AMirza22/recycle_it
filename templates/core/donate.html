@@ -61,11 +61,27 @@
                 </div>
 
                 <div class="form-group">
-                    <label>{{ form.collection_address.label }} *</label>
-                    {{ form.collection_address }}
-                    {% if form.collection_address.errors %}
-                    <p class="field-error">{{ form.collection_address.errors.0 }}</p>
+                    <label>{{ form.street_address.label }} *</label>
+                    {{ form.street_address }}
+                    {% if form.street_address.errors %}
+                    <p class="field-error">{{ form.street_address.errors.0 }}</p>
                     {% endif %}
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label>{{ form.city.label }} *</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                        <p class="field-error">{{ form.city.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.postcode.label }} *</label>
+                        {{ form.postcode }}
+                        {% if form.postcode.errors %}
+                        <p class="field-error">{{ form.postcode.errors.0 }}</p>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="form-group form-group-half">

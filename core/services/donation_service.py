@@ -75,7 +75,7 @@ class DonationService:
                 f'Dear {donation.donor.contact_person},\n\n'
                 f'Thank you for submitting your collection request.\n\n'
                 f'Your reference ID is: {reference_id}\n'
-                f'Collection address: {donation.collection_address}\n\n'
+                f'Collection address: {donation.full_address}\n\n'
                 f'A member of our team will review your request shortly.\n\n'
                 f'Kind regards,\n'
                 f'The Recycle-IT! Team\n'

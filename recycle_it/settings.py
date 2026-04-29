@@ -121,7 +121,14 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_IRL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("GMAIL_APP_PASSWORD")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

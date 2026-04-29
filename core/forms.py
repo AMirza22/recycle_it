@@ -1,6 +1,7 @@
 from django import forms
+import re
 from django.contrib.auth.forms import AuthenticationForm
-
+from .services.route_service import RouteService
 
 # ── Login Form ────────────────────────────────────────────────────────────────
 
@@ -50,10 +51,20 @@ class DonorSubmissionForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={'placeholder': '01234 567890'})
     )
-    collection_address = forms.CharField(
-        max_length=500,
-        label='Collection Address',
-        widget=forms.TextInput(attrs={'placeholder': 'Street, City, Postcode'})
+    street_address = forms.CharField(
+        max_length=255,
+        label='Street Address',
+        widget=forms.TextInput(attrs={'placeholder': '10 Market Street'})
+    )
+    city = forms.CharField(
+        max_length=100,
+        label='City / Town',
+        widget=forms.TextInput(attrs={'placeholder': 'Bolton'})
+    )
+    postcode = forms.CharField(
+        max_length=10,
+        label='Postcode',
+        widget=forms.TextInput(attrs={'placeholder': 'BL1 1AA'})
     )
     preferred_collection_datetime = forms.DateTimeField(
         label='Preferred Collection Date / Time',
@@ -122,6 +133,8 @@ class DonorSubmissionForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
+
+        # Validate at least one item quantity
         qty_fields = [
             'qty_processor', 'qty_monitor', 'qty_printer',
             'qty_accessories', 'qty_networking', 'qty_mobile', 'qty_other',
@@ -131,7 +144,33 @@ class DonorSubmissionForm(forms.Form):
             raise forms.ValidationError(
                 'Please enter at least one item for collection.'
             )
+
+        # Geocode the composed address — only if postcode passed validation
+        street = cleaned_data.get('street_address', '')
+        city = cleaned_data.get('city', '')
+        postcode = cleaned_data.get('postcode', '')
+
+        if street and city and postcode:
+            composed = f"{street}, {city}, {postcode}"
+            coords = RouteService.geocode_address(composed)
+            if coords is None:
+                raise forms.ValidationError(
+                    'We could not locate this address. Please check all fields '
+                    'are correct and the postcode is valid.'
+                )
+            self._geocoded_lon = coords[0]
+            self._geocoded_lat = coords[1]
+
         return cleaned_data
+    
+    def clean_postcode(self):
+        postcode = self.cleaned_data.get('postcode', '').strip().upper()
+        pattern = r'^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$'
+        if not re.match(pattern, postcode, re.IGNORECASE):
+            raise forms.ValidationError(
+                'Enter a valid UK postcode (e.g. BL1 1AA).'
+            )
+        return postcode
 
     def get_donor_data(self):
         return {
@@ -143,7 +182,11 @@ class DonorSubmissionForm(forms.Form):
 
     def get_donation_data(self):
         return {
-            'collection_address': self.cleaned_data['collection_address'],
+            'street_address': self.cleaned_data['street_address'],
+            'city': self.cleaned_data['city'],
+            'postcode': self.cleaned_data['postcode'],
+            'latitude': getattr(self, '_geocoded_lat', None),
+            'longitude': getattr(self, '_geocoded_lon', None),
             'preferred_collection_datetime': self.cleaned_data.get('preferred_collection_datetime'),
             'data_destruction_required': self.cleaned_data['data_destruction_required'] == 'yes',
             'notes': self.cleaned_data.get('notes', ''),
