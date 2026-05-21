@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-from pickle import STACK_GLOBAL
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -110,7 +109,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_IRL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
