@@ -2,7 +2,7 @@
 
 A Django-based middleware system for [Recycle-IT! CIC](https://www.recycle-it.org.uk), a Bolton-based circular economy organisation. This platform replaces manual workflows (PDF forms, spreadsheets, Google Maps routing, manual CO₂ calculations) with an integrated digital system for managing IT equipment donations and collections.
 
-> **Note — Viva/Demo Branch:** This branch (`viva`) is configured with SQLite and includes a pre-seeded database (`db.sqlite3`) with realistic sample data for demonstration purposes. No database setup is required — just install dependencies, configure the `.env` file, and run the server. The production branch (`dev`) uses MySQL.
+> **Note  Viva/Demo Branch:** This branch (`viva`) is configured with SQLite and includes a pre-seeded database (`db.sqlite3`) with realistic sample data for demonstration purposes. No database setup is required  just install dependencies, configure the `.env` file, and run the server. The production branch (`dev`) uses MySQL.
 
 ---
 
@@ -10,8 +10,8 @@ A Django-based middleware system for [Recycle-IT! CIC](https://www.recycle-it.or
 
 Recycle-IT! serves two user types:
 
-- **Public donors** — submit IT equipment collection requests via an online form
-- **Internal staff** — review, approve, and schedule collections through a dedicated dashboard
+- **Public donors**  submit IT equipment collection requests via an online form
+- **Internal staff**  review, approve, and schedule collections through a dedicated dashboard
 
 Core capabilities include donation intake, staff review workflows, optimised route planning via the OpenRouteService API, CO₂ emissions tracking, and a KPI dashboard.
 
@@ -34,31 +34,31 @@ Core capabilities include donation intake, staff review workflows, optimised rou
 ```
 recycle_it/
 ├── core/
-│   ├── models.py           # User, Donor, Donation, Item, Collection, EmissionRecord, SystemSettings
-│   ├── views.py            # Thin views — request handling and routing only
-│   ├── forms.py            # Login, donation submission, collection, user and settings forms
-│   ├── urls.py             # URL routing for all app features
-│   ├── admin.py
-│   ├── backends.py         # Custom email-based authentication backend
-│   ├── tests.py            # Unit test suite (service layer)
-│   ├── test_runner.py      # Custom timed test runner with per-test stats
-│   └── services/
-│       ├── auth_service.py         # User creation, editing, deletion, verification
-│       ├── donation_service.py     # Donation intake, approval workflow, email notifications
-│       ├── collection_service.py   # Collection scheduling and donation assignment
-│       ├── route_service.py        # ORS Geocoding + VROOM + Directions API integration
-│       └── emissions_service.py    # CO₂ calculation using configurable SystemSettings
+│  ├── models.py      # User, Donor, Donation, Item, Collection, EmissionRecord, SystemSettings
+│  ├── views.py      # Thin views  request handling and routing only
+│  ├── forms.py      # Login, donation submission, collection, user and settings forms
+│  ├── urls.py       # URL routing for all app features
+│  ├── admin.py
+│  ├── backends.py     # Custom email-based authentication backend
+│  ├── tests.py      # Unit test suite (service layer)
+│  ├── test_runner.py   # Custom timed test runner with per-test stats
+│  └── services/
+│    ├── auth_service.py     # User creation, editing, deletion, verification
+│    ├── donation_service.py   # Donation intake, approval workflow, email notifications
+│    ├── collection_service.py  # Collection scheduling and donation assignment
+│    ├── route_service.py    # ORS Geocoding + VROOM + Directions API integration
+│    └── emissions_service.py  # CO₂ calculation using configurable SystemSettings
 ├── templates/
-│   └── core/               # HTML templates for all views (16 pages, 2 base templates)
+│  └── core/        # HTML templates for all views (16 pages, 2 base templates)
 ├── static/
-│   └── css/                # Stylesheets (base, staff portal, donor form)
-├── recycle_it/             # Django project settings, URLs, WSGI/ASGI
-├── .env_example            # Environment variable template
-├── .env                    # Pre-configured for viva demo (SQLite, ORS key included)
-├── db.sqlite3              # Pre-seeded SQLite database with demo data
+│  └── css/        # Stylesheets (base, staff portal, donor form)
+├── recycle_it/       # Django project settings, URLs, WSGI/ASGI
+├── .env_example      # Environment variable template
+├── .env          # Pre-configured for viva demo (SQLite, ORS key included)
+├── db.sqlite3       # Pre-seeded SQLite database with demo data
 ├── requirements.txt
 ├── manage.py
-└── PopulateData.py         # Script to reset and re-seed the database with sample data
+└── PopulateData.py     # Script to reset and re-seed the database with sample data
 ```
 
 ---
@@ -75,7 +75,7 @@ recycle_it/
 ```bash
 cd recycle_it
 python -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
+source venv/bin/activate   # Windows: venv\Scripts\activate
 ```
 
 ### 2. Install dependencies
@@ -92,7 +92,7 @@ python manage.py runserver
 
 Visit `http://127.0.0.1:8000/` in your browser.
 
-The pre-seeded database is already included — no migrations or setup required.
+The pre-seeded database is already included  no migrations or setup required.
 
 ---
 
@@ -133,15 +133,15 @@ python manage.py test
 
 ## Key Design Decisions
 
-**Email-based authentication** — Django's auth machinery expects a `username` field, but this system authenticates via email. The custom `EmailBackend` in `core/backends.py` handles this by accepting `username` in the signature and looking it up as an email in the database. `AuthService.create_user()` sets both `username` and `email` to the same value to keep the system consistent.
+**Email-based authentication**  Django's auth machinery expects a `username` field, but this system authenticates via email. The custom `EmailBackend` in `core/backends.py` handles this by accepting `username` in the signature and looking it up as an email in the database. `AuthService.create_user()` sets both `username` and `email` to the same value to keep the system consistent.
 
-**Geocoding at submission time** — Donor addresses (`street_address`, `city`, `postcode`) are geocoded via the ORS Geocoding endpoint when the donation form is submitted, with coordinates persisted on the `Donation` model. This avoids re-geocoding at route optimisation time.
+**Geocoding at submission time**  Donor addresses (`street_address`, `city`, `postcode`) are geocoded via the ORS Geocoding endpoint when the donation form is submitted, with coordinates persisted on the `Donation` model. This avoids re-geocoding at route optimisation time.
 
-**ORS route optimisation** — Three separate ORS endpoints are used: Geocoding (address → coordinates at submission), VROOM (optimised stop ordering), and Directions (actual road distance in km, since VROOM responses do not include distance). A duration-based fallback at 50 km/h is used if the Directions call fails, and a manual fallback is available if ORS is entirely unavailable.
+**ORS route optimisation**  Three separate ORS endpoints are used: Geocoding (address → coordinates at submission), VROOM (optimised stop ordering), and Directions (actual road distance in km, since VROOM responses do not include distance). A duration-based fallback at 50 km/h is used if the Directions call fails, and a manual fallback is available if ORS is entirely unavailable.
 
-**Service layer** — All business logic is encapsulated in `core/services/` rather than in views. Views are kept deliberately thin — they receive a request, call the relevant service method, and return a response. This keeps the logic independently testable and the codebase maintainable.
+**Service layer**  All business logic is encapsulated in `core/services/` rather than in views. Views are kept deliberately thin  they receive a request, call the relevant service method, and return a response. This keeps the logic independently testable and the codebase maintainable.
 
-**Configurable emissions formula** — CO₂ per litre and fuel efficiency values are stored in `SystemSettings` rather than hardcoded, allowing staff to update them via the KPI dashboard without touching the codebase.
+**Configurable emissions formula**  CO₂ per litre and fuel efficiency values are stored in `SystemSettings` rather than hardcoded, allowing staff to update them via the KPI dashboard without touching the codebase.
 
 ---
 
@@ -150,8 +150,8 @@ python manage.py test
 | Branch | Purpose |
 |---|---|
 | `master` | Original baseline, preserved as submitted |
-| `dev` | Active development — MySQL configuration |
-| `viva` | Demo branch — SQLite, pre-seeded database |
+| `dev` | Active development  MySQL configuration |
+| `viva` | Demo branch  SQLite, pre-seeded database |
 
 ---
 
