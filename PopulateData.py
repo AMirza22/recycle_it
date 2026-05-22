@@ -6,17 +6,12 @@ development purposes. Safe to run multiple times (idempotent by default).
 
 Usage
 -----
-    # From your Django project root (same level as manage.py):
+    # From your Django project root:
     python populate_data.py
 
     # Wipe all existing app data first, then re-seed:
     python populate_data.py --reset
 
-Requirements
-------------
-    DJANGO_SETTINGS_MODULE must be resolvable. The script sets it to
-    'recycle_it.settings' — adjust the line below if yours differs.
-"""
 
 import os
 import sys
